@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>No internet - Dunk Shot</title>
+<!-- Extension pages can't run inline <script> (Chrome's default extension CSP),
+     so the CSS and JS live in their own files next to this one. -->
+<link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <div class="stage" id="stage">
+    <canvas id="game"></canvas>
+    <div class="score" id="score">0</div>
+
+    <div class="overlay" id="overlay">
+      <h1 id="ovTitle">Dunk Shot</h1>
+      <div class="big" id="ovStats"></div>
+      <p id="ovHint">Drag down and back, then let go. Bank it off the walls, a clean swish scores more.</p>
+      <button id="playBtn">Play</button>
+    </div>
+
+    <!-- Shown only when you were redirected here and the connection is back -->
+    <div class="net hidden" id="net">
+      <span id="netMsg"></span>
+      <button id="netBtn">Reload page</button>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

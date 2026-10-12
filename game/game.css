@@ -1,0 +1,141 @@
+/* ------------------------------------------------------------------
+     COLOR TOKENS
+     Defining colors once as CSS variables means you can re-skin the whole
+     game by editing this block. The JS below reads these same values
+     (see the PALETTE constant) so the canvas and the page match.
+     ------------------------------------------------------------------ */
+  :root {
+    --page-bg: #e6e1d3;          /* the area AROUND the game (light mode) */
+    --court:   #10262e;          /* deep night-court teal */
+    --chalk:   #e9e4d6;          /* line markings, text */
+    --ball:    #f08a24;          /* the basketball */
+    --rim:     #e5482f;          /* hoop rim */
+    --gold:    #f3c13a;          /* swish popups */
+
+    /* Make room for phone notches / home bars */
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --page-bg: #081418; }
+  }
+  :root[data-theme="dark"] { --page-bg: #081418; }
+
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--page-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    overscroll-behavior: none;       /* no pull-to-refresh while dragging */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* ------------------------------------------------------------------
+     THE STAGE
+     The game world is a fixed 400 x 700 "logical" size (see W and H in
+     the JS). The stage keeps that 4:7 shape and scales to fit the
+     screen. Because we always draw in logical units and let CSS/canvas
+     scale it, the game feels identical on every device.
+     ------------------------------------------------------------------ */
+  .stage {
+    position: relative;
+    /* width is the smaller of: the available width, or the width that makes the
+       4:7 box exactly as tall as the screen. Two lines = fallback for old browsers. */
+    width: min(100%, calc((100vh - 16px) * 4 / 7));
+    width: min(100%, calc((100dvh - 16px) * 4 / 7));
+    aspect-ratio: 4 / 7;
+    background: var(--court);
+    border-radius: 14px;
+    overflow: hidden;
+    container-type: inline-size;     /* lets us size text in "cqw" = % of stage width */
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;              /* stop the browser from scrolling when you drag */
+  }
+
+  /* Score sits on top of the canvas; pointer-events:none lets drags pass through it */
+  .score {
+    position: absolute;
+    top: 3%;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
+    font-weight: 700;
+    font-size: 64px;
+    font-size: 17cqw;
+    line-height: 1;
+    color: var(--chalk);
+    opacity: 0.92;
+    pointer-events: none;
+  }
+
+  /* Title / game-over panel */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px;
+    text-align: center;
+    color: var(--chalk);
+    background: rgba(16, 38, 46, 0.86);
+    transition: opacity 0.25s ease;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay h1 {
+    margin: 0;
+    font-family: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
+    font-weight: 600;
+    font-size: 72px;
+    font-size: 20cqw;
+    line-height: 0.95;
+  }
+  .overlay p { margin: 0; max-width: 28ch; line-height: 1.45; font-size: 16px; }
+  .overlay .big {
+    font-family: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+  }
+  .overlay button {
+    margin-top: 6px;
+    padding: 12px 34px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ball);
+    color: #1a0f05;
+    font-family: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
+    font-weight: 300;
+    font-size: 26px;
+    cursor: pointer;
+  }
+  .overlay button:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; }
+
+/* ---- Extension-only: the "you're back online" banner ---- */
+.net {
+  position: absolute;
+  left: 12px; right: 12px; bottom: 12px;
+  z-index: 5;                         /* above the title/game-over overlay */
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 12px 10px 16px;
+  border-radius: 999px;
+  background: var(--chalk);
+  color: #10262e;
+  font-size: 14px;
+}
+.net.hidden { display: none; }
+.net button {
+  border: 0; border-radius: 999px; padding: 8px 16px;
+  background: #10262e; color: var(--chalk);
+  font: inherit; font-weight: 600; cursor: pointer;
+}
+.net button:focus-visible { outline: 3px solid var(--ball); outline-offset: 2px; }
